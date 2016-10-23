@@ -119,6 +119,7 @@ def rollout(env, agent, timestep_limit):
         ob = agent.obfilt(ob)
         data["observation"].append(ob)
         action, agentinfo = agent.act(ob)
+        action=np.clip(action, -1.5, 1.5)
         data["action"].append(action)
         for (k,v) in agentinfo.iteritems():
             data[k].append(v)
