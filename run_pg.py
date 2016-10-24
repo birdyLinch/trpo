@@ -31,6 +31,26 @@ if __name__ == "__main__":
         # args.timestep_limit = env_spec.timestep_limit 
         args.timestep_limit = 3000   
     cfg = args.__dict__
+    cfg = {'lam': 0.97, 
+	'cg_damping': 0.001, 
+	'env': 'HumanEnv-v0', 
+	'plot': False, 
+	'activation': 'tanh', 
+	'agent': 'modular_rl.agentzoo.TrpoAgent', 
+	'outfile': '/tmp/a.h5', 
+	'max_kl': 0.01, 
+	'timestep_limit': 3000, 
+	'video': 1, 
+	'snapshot_every': 0, 
+	'parallel': 0, 
+	'n_iter': 50000, 
+	'load_snapshot': '', 
+	'filter': 1, 'use_hdf': 0, 
+	'seed': 0, 
+	'hid_sizes': [128, 128], 
+	'timesteps_per_batch': 10000, 
+	'gamma': 0.99, 	
+	'metadata': ''}
     np.random.seed(args.seed)
     agent = agent_ctor(env.observation_space, env.action_space, cfg)
     if args.use_hdf:
@@ -45,15 +65,15 @@ if __name__ == "__main__":
         print "*********** Iteration %i ****************" % COUNTER
         print tabulate(filter(lambda (k,v) : np.asarray(v).size==1, stats.items())) #pylint: disable=W0110
         # Store to hdf5
-        # if args.use_hdf:
-        #     for (stat,val) in stats.items():
-        #         if np.asarray(val).ndim==0:
-        #             diagnostics[stat].append(val)
-        #         else:
-        #             assert val.ndim == 1
-        #             diagnostics[stat].extend(val)
-        #     if args.snapshot_every and ((COUNTER % args.snapshot_every==0) or (COUNTER==args.n_iter)): 
-        #         hdf['/agent_snapshots/%0.4i'%COUNTER] = np.array(cPickle.dumps(agent,-1))
+        if args.use_hdf:
+            for (stat,val) in stats.items():
+                if np.asarray(val).ndim==0:
+                    diagnostics[stat].append(val)
+                else:
+                    assert val.ndim == 1
+                    diagnostics[stat].extend(val)
+            if args.snapshot_every and ((COUNTER % args.snapshot_every==0) or (COUNTER==args.n_iter)): 
+                hdf['/agent_snapshots/%0.4i'%COUNTER] = np.array(cPickle.dumps(agent,-1))
         
         # Plot
         if args.plot:
